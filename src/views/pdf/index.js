@@ -1,37 +1,48 @@
 import React from 'react';
-import {Table} from 'antd';
+import {Table, Popconfirm} from 'antd';
 import reqwest from 'reqwest';
 import {
     Link
 } from 'react-router-dom';
 import './index.css';
 
-const columns = [
-    {
-        title: '书名',
-        dataIndex: 'name',
-    },
-    {
-        title: '期数',
-        dataIndex: 'period',
-    },
-    {
-        title: '出版日期',
-        dataIndex: 'publicationDate',
-    },
-    {
-        title: '总页数',
-        dataIndex: 'totalPage',
-    },
-    {
-        title: '操作',
-        dataIndex: '',
-        key: 'x',
-        render: (text, record, index) => <Link to={`/preview/${record.id}`}>预览</Link>
-    },
-];
 
 class PDF extends React.Component {
+    columns = [
+        {
+            title: '书名',
+            dataIndex: 'name',
+        },
+        {
+            title: '期数',
+            dataIndex: 'period',
+        },
+        {
+            title: '出版日期',
+            dataIndex: 'publicationDate',
+        },
+        {
+            title: '总页数',
+            dataIndex: 'totalPage',
+        },
+        {
+            title: '操作',
+            dataIndex: '',
+            key: 'x',
+            render: (text, record, index) => {
+                return (
+                    <div>
+                        <Link to={`/preview/${record.id}`}>预览</Link>
+                        <span className="ant-divider"/>
+                        <Popconfirm title="确认要删除吗?" onConfirm={() => this.onDelete(index,record.id)}>
+                            <a href="#">删除</a>
+                        </Popconfirm>
+                    </div>
+                );
+            }
+        },
+    ];
+
     state = {
         data: [],
         pagination: {},
@@ -79,9 +90,29 @@ class PDF extends React.Component {
         this.fetch();
     }
 
+    onDelete = (index, id) => {
+        console.log("index", index)
+        reqwest({
+            url: 'http://www.hbsrcfwj.cn/api/biz/book/' + id,
+            method: 'delete',
+            type: 'json',
+        }).then((rs) => {
+            console.log("rs", rs)
+            const data = [...this.state.data];
+            data.splice(index, 1);
+            const pagination = {...this.state.pagination};
+            pagination.total = data.length;
+            this.setState({
+                loading: false,
+                data: data,
+                pagination,
+            });
+        });
+    }
+
     render() {
         return (
-            <Table columns={columns}
+            <Table columns={this.columns}
                    rowKey={record => record.id}
                    dataSource={this.state.data}
                    pagination={this.state.pagination}
