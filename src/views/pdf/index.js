@@ -35,7 +35,7 @@ class PDF extends React.Component {
                         <Link to={`/preview/${record.id}`}>预览</Link>
                         <span className="ant-divider"/>
                         <Popconfirm title="确认要删除吗?" onConfirm={() => this.onDelete(index,record.id)}>
-                            <a href="#">删除</a>
+                            <a href="##">删除</a>
                         </Popconfirm>
                     </div>
                 );
